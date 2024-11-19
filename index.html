@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id" x-data="{isDark: $persist(false)}" :class="{'dark': isDark}" @keyup.ctrl.space="isDark = !isDark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulu Generator</title>
+    <meta name="description" content="Pulu Generator">
+    <meta name="keywords" content="Pulu,Pulu Generator">
+    <meta name="author" content="sejutaimpian">
+    <link rel="shortcut icon" href="./logo.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="./src/output.css">
+
+    <!-- plugin alpineJS, myScript, core alpineJS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="./script.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="flex flex-col justify-between px-4 mx-auto readable-width gap-y-4 max-h-svh" x-data="puluGenerator">
+    <h1 class="mt-2 text-center">Pulu Generator</h1>
+    <div class="flex-1"></div>
+    <div x-cloak x-show="!histories.length" class="flex flex-col items-center rounded-xl">
+        <img src="./404.png" alt="404" class="w-1/2">
+        <h1 class="mb-3">204</h1>
+        <p title="No Content">Pu PuULuuU</p>
+    </div>
+    <div class="[&>*]:py-4 divide-y-2 overflow-y-scroll no-scrollbar">
+        <!-- template dikasih properti hidden agar fix divide-y-2 di parent -->
+        <template x-for="(history, index) in histories" :key="index" hidden>
+            <div class="space-y-2">
+                <p x-text="history.isPulu ? history.pulu : history.sentence"></p>
+                <div class="flex">
+                    <!-- <button type="button" title="text to speech"
+                        class="p-2 [&>svg]:size-4 md:[&>svg]:size-5 rounded-full hover:outline-slate-300 hover:outline outline-1 active:bg-slate-100 dark:active:bg-slate-800 dark:hover:outline-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M16.9337 8.96494C16.426 5.03562 13.0675 2 9 2 4.58172 2 1 5.58172 1 10 1 11.8924 1.65707 13.6313 2.7555 15.0011 3.56351 16.0087 4.00033 17.1252 4.00025 18.3061L4 22H13L13.001 19H15C16.1046 19 17 18.1046 17 17V14.071L18.9593 13.2317C19.3025 13.0847 19.3324 12.7367 19.1842 12.5037L16.9337 8.96494ZM3 10C3 6.68629 5.68629 4 9 4 12.0243 4 14.5665 6.25141 14.9501 9.22118L15.0072 9.66262 16.5497 12.0881 15 12.7519V17H11.0017L11.0007 20H6.00013L6.00025 18.3063C6.00036 16.6672 5.40965 15.114 4.31578 13.7499 3.46818 12.6929 3 11.3849 3 10ZM21.1535 18.1024 19.4893 16.9929C20.4436 15.5642 21 13.8471 21 12.0001 21 10.153 20.4436 8.4359 19.4893 7.00722L21.1535 5.89771C22.32 7.64386 23 9.74254 23 12.0001 23 14.2576 22.32 16.3562 21.1535 18.1024Z">
+                            </path>
+                        </svg>
+                    </button> -->
+                    <button type="button" title="Generate ulang" @click="history.pulu = generatePulu(history.sentence)"
+                        class="p-2 [&>svg]:size-4 md:[&>svg]:size-5 rounded-full hover:outline-slate-300 hover:outline outline-1 active:bg-slate-100 dark:active:bg-slate-800 dark:hover:outline-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M5.46257 4.43262C7.21556 2.91688 9.5007 2 12 2C17.5228 2 22 6.47715 22 12C22 14.1361 21.3302 16.1158 20.1892 17.7406L17 12H20C20 7.58172 16.4183 4 12 4C9.84982 4 7.89777 4.84827 6.46023 6.22842L5.46257 4.43262ZM18.5374 19.5674C16.7844 21.0831 14.4993 22 12 22C6.47715 22 2 17.5228 2 12C2 9.86386 2.66979 7.88416 3.8108 6.25944L7 12H4C4 16.4183 7.58172 20 12 20C14.1502 20 16.1022 19.1517 17.5398 17.7716L18.5374 19.5674Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <button type="button" title="Copy pulu" @click="copy(history.pulu)"
+                        class="p-2 [&>svg]:size-4 md:[&>svg]:size-5 rounded-full hover:outline-slate-300 hover:outline outline-1 active:bg-slate-100 dark:active:bg-slate-800 dark:hover:outline-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <button type="button" title="Hapus kalimat" @click="deleteHistory(index)"
+                        class="p-2 [&>svg]:size-4 md:[&>svg]:size-5 rounded-full hover:outline-slate-300 hover:outline outline-1 active:bg-slate-100 dark:active:bg-slate-800 dark:hover:outline-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M7 4V2H17V4H22V6H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V6H2V4H7ZM6 6V20H18V6H6ZM9 9H11V17H9V9ZM13 9H15V17H13V9Z">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <div class="flex-1"></div>
+                    <button type="button" title="Lihat kalimat" @click="history.isPulu = !history.isPulu"
+                        class="p-2 [&>svg]:size-4 md:[&>svg]:size-5 rounded-full hover:outline-slate-300 hover:outline outline-1 active:bg-slate-100 dark:active:bg-slate-800 dark:hover:outline-slate-700">
+                        <svg x-cloak x-show="history.isPulu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path
+                                d="M12.0003 3C17.3924 3 21.8784 6.87976 22.8189 12C21.8784 17.1202 17.3924 21 12.0003 21C6.60812 21 2.12215 17.1202 1.18164 12C2.12215 6.87976 6.60812 3 12.0003 3ZM12.0003 19C16.2359 19 19.8603 16.052 20.7777 12C19.8603 7.94803 16.2359 5 12.0003 5C7.7646 5 4.14022 7.94803 3.22278 12C4.14022 16.052 7.7646 19 12.0003 19ZM12.0003 16.5C9.51498 16.5 7.50026 14.4853 7.50026 12C7.50026 9.51472 9.51498 7.5 12.0003 7.5C14.4855 7.5 16.5003 9.51472 16.5003 12C16.5003 14.4853 14.4855 16.5 12.0003 16.5ZM12.0003 14.5C13.381 14.5 14.5003 13.3807 14.5003 12C14.5003 10.6193 13.381 9.5 12.0003 9.5C10.6196 9.5 9.50026 10.6193 9.50026 12C9.50026 13.3807 10.6196 14.5 12.0003 14.5Z">
+                            </path>
+                        </svg>
+                        <svg x-cloak x-show="!history.isPulu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path
+                                d="M17.8827 19.2968C16.1814 20.3755 14.1638 21.0002 12.0003 21.0002C6.60812 21.0002 2.12215 17.1204 1.18164 12.0002C1.61832 9.62282 2.81932 7.5129 4.52047 5.93457L1.39366 2.80777L2.80788 1.39355L22.6069 21.1925L21.1927 22.6068L17.8827 19.2968ZM5.9356 7.3497C4.60673 8.56015 3.6378 10.1672 3.22278 12.0002C4.14022 16.0521 7.7646 19.0002 12.0003 19.0002C13.5997 19.0002 15.112 18.5798 16.4243 17.8384L14.396 15.8101C13.7023 16.2472 12.8808 16.5002 12.0003 16.5002C9.51498 16.5002 7.50026 14.4854 7.50026 12.0002C7.50026 11.1196 7.75317 10.2981 8.19031 9.60442L5.9356 7.3497ZM12.9139 14.328L9.67246 11.0866C9.5613 11.3696 9.50026 11.6777 9.50026 12.0002C9.50026 13.3809 10.6196 14.5002 12.0003 14.5002C12.3227 14.5002 12.6309 14.4391 12.9139 14.328ZM20.8068 16.5925L19.376 15.1617C20.0319 14.2268 20.5154 13.1586 20.7777 12.0002C19.8603 7.94818 16.2359 5.00016 12.0003 5.00016C11.1544 5.00016 10.3329 5.11773 9.55249 5.33818L7.97446 3.76015C9.22127 3.26959 10.5793 3.00016 12.0003 3.00016C17.3924 3.00016 21.8784 6.87992 22.8189 12.0002C22.5067 13.6998 21.8038 15.2628 20.8068 16.5925ZM11.7229 7.50857C11.8146 7.50299 11.9071 7.50016 12.0003 7.50016C14.4855 7.50016 16.5003 9.51488 16.5003 12.0002C16.5003 12.0933 16.4974 12.1858 16.4919 12.2775L11.7229 7.50857Z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
+    <form @submit.prevent="generate" class="flex gap-x-2 md:gap-x-4">
+        <div class="relative flex-1">
+            <input id="sentence" type="text" autocomplete="off" @keydown.ctrl.k.window.prevent
+                @keyup.ctrl.k.window="$refs.input.focus()" @keyup.escape="$refs.input.blur()" x-model="sentence"
+                x-ref="input"
+                class="w-full px-2 py-2 border rounded-xl border-slate-300 bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-75 dark:border-slate-700 dark:bg-slate-800/50 dark:focus-visible:outline-blue-600"
+                name="sentence" placeholder="Masukkan kalimat..." />
+            <span x-bind:class="{ 'md:flex': sentence === '' }"
+                class="absolute inset-y-0 right-0 items-center hidden pr-3 text-sm font-light text-slate-400 dark:text-slate-500">
+                CTRL + K</span>
+        </div>
+        <div class="flex justify-center">
+            <button type="button" title="Hapus inputan" @click="clear"
+                class="px-1 md:px-2 [&>svg]:size-5 md:[&>svg]:size-6 rounded-full hover:outline-slate-300 hover:outline outline-1 active:bg-slate-100 dark:active:bg-slate-800 dark:hover:outline-slate-700">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M6.53451 3H20.9993C21.5516 3 21.9993 3.44772 21.9993 4V20C21.9993 20.5523 21.5516 21 20.9993 21H6.53451C6.20015 21 5.88792 20.8329 5.70246 20.5547L0.369122 12.5547C0.145189 12.2188 0.145189 11.7812 0.369122 11.4453L5.70246 3.4453C5.88792 3.1671 6.20015 3 6.53451 3ZM7.06969 5L2.40302 12L7.06969 19H19.9993V5H7.06969ZM12.9993 10.5858L15.8277 7.75736L17.242 9.17157L14.4135 12L17.242 14.8284L15.8277 16.2426L12.9993 13.4142L10.1709 16.2426L8.75668 14.8284L11.5851 12L8.75668 9.17157L10.1709 7.75736L12.9993 10.5858Z">
+                    </path>
+                </svg>
+            </button>
+            <button type="submit" title="Generate pulu"
+                class="px-1 md:px-2 [&>svg]:size-5 md:[&>svg]:size-6 rounded-full hover:outline-slate-300 hover:outline hover:outline-1 active:bg-slate-100 dark:active:bg-slate-800 dark:hover:outline-slate-700">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M16.9337 8.96494C16.426 5.03562 13.0675 2 9 2 4.58172 2 1 5.58172 1 10 1 11.8924 1.65707 13.6313 2.7555 15.0011 3.56351 16.0087 4.00033 17.1252 4.00025 18.3061L4 22H13L13.001 19H15C16.1046 19 17 18.1046 17 17V14.071L18.9593 13.2317C19.3025 13.0847 19.3324 12.7367 19.1842 12.5037L16.9337 8.96494ZM3 10C3 6.68629 5.68629 4 9 4 12.0243 4 14.5665 6.25141 14.9501 9.22118L15.0072 9.66262 16.5497 12.0881 15 12.7519V17H11.0017L11.0007 20H6.00013L6.00025 18.3063C6.00036 16.6672 5.40965 15.114 4.31578 13.7499 3.46818 12.6929 3 11.3849 3 10ZM21.1535 18.1024 19.4893 16.9929C20.4436 15.5642 21 13.8471 21 12.0001 21 10.153 20.4436 8.4359 19.4893 7.00722L21.1535 5.89771C22.32 7.64386 23 9.74254 23 12.0001 23 14.2576 22.32 16.3562 21.1535 18.1024Z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </form>
+    <!-- Notifications -->
+    <div id="notif" x-data="{
+            notifications: [],
+            displayDuration: 8000,
+            soundEffect: false,
+    
+            addNotification({ variant = 'info', sender = null, title = null, message = null}) {
+                const id = Date.now()
+                const notification = { id, variant, sender, title, message }
+    
+                // Keep only the most recent 20 notifications
+                if (this.notifications.length >= 20) {
+                    this.notifications.splice(0, this.notifications.length - 19)
+                }
+    
+                // Add the new notification to the notifications stack
+                this.notifications.push(notification)
+    
+                if (this.soundEffect) {
+                    // Play the notification sound
+                    const notificationSound = new Audio('https://res.cloudinary.com/ds8pgw1pf/video/upload/v1728571480/penguinui/component-assets/sounds/ding.mp3')
+                    notificationSound.play().catch((error) => {
+                        console.error('Error playing the sound:', error)
+                    })
+                }
+            },
+            removeNotification(id) {
+                setTimeout(() => {
+                    this.notifications = this.notifications.filter(
+                        (notification) => notification.id !== id,
+                    )
+                }, 400);
+            },
+        }" x-on:notify.window="addNotification({
+                variant: $event.detail.variant,
+                sender: $event.detail.sender,
+                title: $event.detail.title,
+                message: $event.detail.message,
+            })">
+
+        <div x-on:mouseenter="$dispatch('pause-auto-dismiss')" x-on:mouseleave="$dispatch('resume-auto-dismiss')"
+            class="group pointer-events-none fixed inset-x-8 top-0 z-[99] flex max-w-full flex-col gap-2 bg-transparent px-6 py-6 md:bottom-0 md:left-[unset] md:right-0 md:top-[unset] md:max-w-sm">
+            <template x-for="(notification, index) in notifications" x-bind:key="notification.id">
+                <!-- root div holds all of the notifications  -->
+                <div>
+                    <!-- Info Notification  -->
+                    <template x-if="notification.variant === 'info'">
+                        <div x-data="{ isVisible: false, timeout: null }" x-cloak x-show="isVisible"
+                            class="relative bg-white border pointer-events-auto rounded-xl border-sky-600 text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            role="alert" x-on:pause-auto-dismiss.window="clearTimeout(timeout)"
+                            x-on:resume-auto-dismiss.window=" timeout = setTimeout(() => {(isVisible = false), removeNotification(notification.id) }, displayDuration)"
+                            x-init="$nextTick(() => { isVisible = true }), (timeout = setTimeout(() => { isVisible = false, removeNotification(notification.id)}, displayDuration))"
+                            x-transition:enter="transition duration-300 ease-out" x-transition:enter-end="translate-y-0"
+                            x-transition:enter-start="translate-y-8"
+                            x-transition:leave="transition duration-300 ease-in"
+                            x-transition:leave-end="-translate-x-24 opacity-0 md:translate-x-24"
+                            x-transition:leave-start="translate-x-0 opacity-100">
+                            <div
+                                class="flex w-full items-center gap-2.5 bg-sky-600/10 rounded-xl p-4 transition-all duration-300">
+
+                                <!-- Icon -->
+                                <div class="rounded-full bg-sky-600/15 p-0.5 text-sky-600" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                        class="size-5" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+
+                                <!-- Title & Message -->
+                                <div class="flex flex-col gap-2">
+                                    <h3 x-cloak x-show="notification.title" class="text-sm font-semibold text-sky-600"
+                                        x-text="notification.title"></h3>
+                                    <p x-cloak x-show="notification.message" class="text-sm text-pretty"
+                                        x-text="notification.message"></p>
+                                </div>
+
+                                <!--Dismiss Button -->
+                                <button type="button" class="ml-auto" aria-label="dismiss notification"
+                                    x-on:click="(isVisible = false), removeNotification(notification.id)">
+                                    <svg xmlns="http://www.w3.org/2000/svg viewBox=" 0 0 24 24 stroke="currentColor"
+                                        fill="none" stroke-width="2" class="size-5 shrink-0" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Success Notification  -->
+                    <template x-if="notification.variant === 'success'">
+                        <div x-data="{ isVisible: false, timeout: null }" x-cloak x-show="isVisible"
+                            class="relative bg-white border border-green-600 pointer-events-auto rounded-xl text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            role="alert" x-on:pause-auto-dismiss.window="clearTimeout(timeout)"
+                            x-on:resume-auto-dismiss.window=" timeout = setTimeout(() => {(isVisible = false), removeNotification(notification.id) }, displayDuration)"
+                            x-init="$nextTick(() => { isVisible = true }), (timeout = setTimeout(() => { isVisible = false, removeNotification(notification.id)}, displayDuration))"
+                            x-transition:enter="transition duration-300 ease-out" x-transition:enter-end="translate-y-0"
+                            x-transition:enter-start="translate-y-8"
+                            x-transition:leave="transition duration-300 ease-in"
+                            x-transition:leave-end="-translate-x-24 opacity-0 md:translate-x-24"
+                            x-transition:leave-start="translate-x-0 opacity-100">
+                            <div
+                                class="flex w-full items-center gap-2.5 bg-green-600/10 rounded-xl p-4 transition-all duration-300">
+
+                                <!-- Icon -->
+                                <div class="rounded-full bg-green-600/15 p-0.5 text-green-600" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                        class="size-5" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+
+                                <!-- Title & Message -->
+                                <div class="flex flex-col gap-2">
+                                    <h3 x-cloak x-show="notification.title" class="text-sm font-semibold text-green-600"
+                                        x-text="notification.title"></h3>
+                                    <p x-cloak x-show="notification.message" class="text-sm text-pretty"
+                                        x-text="notification.message"></p>
+                                </div>
+
+                                <!--Dismiss Button -->
+                                <button type="button" class="ml-auto" aria-label="dismiss notification"
+                                    x-on:click="(isVisible = false), removeNotification(notification.id)">
+                                    <svg xmlns="http://www.w3.org/2000/svg viewBox=" 0 0 24 24 stroke="currentColor"
+                                        fill="none" stroke-width="2" class="size-5 shrink-0" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Warning Notification  -->
+                    <template x-if="notification.variant === 'warning'">
+                        <div x-data="{ isVisible: false, timeout: null }" x-cloak x-show="isVisible"
+                            class="relative bg-white border pointer-events-auto rounded-xl border-amber-500 text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            role="alert" x-on:pause-auto-dismiss.window="clearTimeout(timeout)"
+                            x-on:resume-auto-dismiss.window=" timeout = setTimeout(() => {(isVisible = false), removeNotification(notification.id) }, displayDuration)"
+                            x-init="$nextTick(() => { isVisible = true }), (timeout = setTimeout(() => { isVisible = false, removeNotification(notification.id)}, displayDuration))"
+                            x-transition:enter="transition duration-300 ease-out" x-transition:enter-end="translate-y-0"
+                            x-transition:enter-start="translate-y-8"
+                            x-transition:leave="transition duration-300 ease-in"
+                            x-transition:leave-end="-translate-x-24 opacity-0 md:translate-x-24"
+                            x-transition:leave-start="translate-x-0 opacity-100">
+                            <div
+                                class="flex w-full items-center gap-2.5 bg-amber-500/10 rounded-xl p-4 transition-all duration-300">
+
+                                <!-- Icon -->
+                                <div class="rounded-full bg-amber-500/15 p-0.5 text-amber-500" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                        class="size-5" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 5Zm0 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+
+                                <!-- Title & Message -->
+                                <div class="flex flex-col gap-2">
+                                    <h3 x-cloak x-show="notification.title" class="text-sm font-semibold text-amber-500"
+                                        x-text="notification.title"></h3>
+                                    <p x-cloak x-show="notification.message" class="text-sm text-pretty"
+                                        x-text="notification.message"></p>
+                                </div>
+
+                                <!--Dismiss Button -->
+                                <button type="button" class="ml-auto" aria-label="dismiss notification"
+                                    x-on:click="(isVisible = false), removeNotification(notification.id)">
+                                    <svg xmlns="http://www.w3.org/2000/svg viewBox=" 0 0 24 24 stroke="currentColor"
+                                        fill="none" stroke-width="2" class="size-5 shrink-0" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Danger Notification  -->
+                    <template x-if="notification.variant === 'danger'">
+                        <div x-data="{ isVisible: false, timeout: null }" x-cloak x-show="isVisible"
+                            class="relative bg-white border border-red-600 pointer-events-auto rounded-xl text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            role="alert" x-on:pause-auto-dismiss.window="clearTimeout(timeout)"
+                            x-on:resume-auto-dismiss.window=" timeout = setTimeout(() => {(isVisible = false), removeNotification(notification.id) }, displayDuration)"
+                            x-init="$nextTick(() => { isVisible = true }), (timeout = setTimeout(() => { isVisible = false, removeNotification(notification.id)}, displayDuration))"
+                            x-transition:enter="transition duration-300 ease-out" x-transition:enter-end="translate-y-0"
+                            x-transition:enter-start="translate-y-8"
+                            x-transition:leave="transition duration-300 ease-in"
+                            x-transition:leave-end="-translate-x-24 opacity-0 md:translate-x-24"
+                            x-transition:leave-start="translate-x-0 opacity-100">
+                            <div
+                                class="flex w-full items-center gap-2.5 bg-red-600/10 rounded-xl p-4 transition-all duration-300">
+
+                                <!-- Icon -->
+                                <div class="rounded-full bg-red-600/15 p-0.5 text-red-600" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                        class="size-5" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 5Zm0 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+
+                                <!-- Title & Message -->
+                                <div class="flex flex-col gap-2">
+                                    <h3 x-cloak x-show="notification.title" class="text-sm font-semibold text-red-600"
+                                        x-text="notification.title"></h3>
+                                    <p x-cloak x-show="notification.message" class="text-sm text-pretty"
+                                        x-text="notification.message"></p>
+                                </div>
+
+                                <!--Dismiss Button -->
+                                <button type="button" class="ml-auto" aria-label="dismiss notification"
+                                    x-on:click="(isVisible = false), removeNotification(notification.id)">
+                                    <svg xmlns="http://www.w3.org/2000/svg viewBox=" 0 0 24 24 stroke="currentColor"
+                                        fill="none" stroke-width="2" class="size-5 shrink-0" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Message Notification  -->
+                    <template x-if="notification.variant === 'message'">
+                        <div x-data="{ isVisible: false, timeout: null }" x-cloak x-show="isVisible"
+                            class="relative bg-white border pointer-events-auto rounded-xl border-slate-300 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            role="alert" x-on:pause-auto-dismiss.window="clearTimeout(timeout)"
+                            x-on:resume-auto-dismiss.window="timeout = setTimeout(() => { isVisible = false, removeNotification(notification.id) }, displayDuration)"
+                            x-init="$nextTick(() => { isVisible = true }), (timeout = setTimeout(() => { isVisible = false, removeNotification(notification.id) }, displayDuration))"
+                            x-transition:enter="transition duration-300 ease-out" x-transition:enter-end="translate-y-0"
+                            x-transition:enter-start="translate-y-8"
+                            x-transition:leave="transition duration-300 ease-in"
+                            x-transition:leave-end="-translate-x-24 opacity-0 md:translate-x-24"
+                            x-transition:leave-start="translate-x-0 opacity-100">
+                            <div
+                                class="flex w-full rounded-xl items-center gap-2.5 bg-slate-100 p-4 transition-all duration-300 dark:bg-slate-800">
+                                <div class="flex w-full items-center gap-2.5">
+
+                                    <!-- Avatar -->
+                                    <img x-cloak x-show="notification.sender.avatar" class="mr-2 rounded-full size-12"
+                                        alt="avatar" aria-hidden="true" x-bind:src="notification.sender.avatar" />
+                                    <div class="flex flex-col items-start gap-2">
+                                        <!-- Title & Message -->
+                                        <h3 x-cloak x-show="notification.sender.name"
+                                            class="text-sm font-semibold text-black dark:text-white"
+                                            x-text="notification.sender.name"></h3>
+                                        <p x-cloak x-show="notification.message" class="text-sm text-pretty"
+                                            x-text="notification.message"></p>
+
+                                        <!-- Action Buttons -->
+                                        <div class="flex items-center gap-4">
+                                            <button type="button"
+                                                class="text-sm font-bold tracking-wide text-center text-blue-700 transition bg-transparent cursor-pointer whitespace-nowrap hover:opacity-75 active:opacity-100 dark:text-blue-600">Reply</button>
+                                            <button type="button"
+                                                class="text-sm font-bold tracking-wide text-center transition bg-transparent cursor-pointer whitespace-nowrap text-slate-700 hover:opacity-75 active:opacity-100 dark:text-slate-300"
+                                                x-on:click=" (isVisible = false), setTimeout(() => { removeNotification(notification.id) }, 400)">Dismiss</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Dismiss Button -->
+                                <button type="button" class="ml-auto" aria-label="dismiss notification"
+                                    x-on:click="(isVisible = false), removeNotification(notification.id)">
+                                    <svg xmlns="http://www.w3.org/2000/svg viewBox=" 0 0 24 24 stroke="currentColor"
+                                        fill="none" stroke-width="2" class="size-5 shrink-0" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+</body>
+
+</html>
